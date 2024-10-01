@@ -1,0 +1,44 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "server"
+main = "src/index.ts"
+compatibility_date = "2024-09-25"
+compatibility_flags = ["nodejs_compat"]
+
+# Workers Logs
+# Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
+# Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs
+[observability]
+enabled = true
+
+# Bind a D1 database. D1 is Cloudflare’s native serverless SQL database.
+# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#d1-databases
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "e-com"
+database_id = "YOUR_DB_ID"
+
+# Bind a Queue producer. Use this binding to schedule an arbitrary task that may be processed later by a Queue consumer.
+# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#queues
+[[queues.producers]]
+binding = "ORDER_QUEUE"
+queue = "order-queue-demo"
+
+[[queues.producers]]
+binding = "USER_SESSION_QUEUE"
+queue = "user-session-queue-demo"
+
+# Bind a Queue consumer. Queue Consumers can retrieve tasks scheduled by Producers to act on them.
+# Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#queues
+[[queues.consumers]]
+queue = "order-queue-demo"
+max_batch_size = 2
+max_batch_timeout = 5
+max_retries = 3
+
+[[queues.consumers]]
+queue = "user-session-queue-demo"
+max_batch_size = 2
+max_batch_timeout = 10
+max_retries = 3
+
+# dead_letter_queue = "my-queue-dlq"
